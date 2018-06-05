@@ -19,13 +19,29 @@ namespace KMeans
 
             Dictionary<int, List<double>> data = readCsv();
             Dictionary<int, List<double>> centroids = SetCentroids(k);
-            Dictionary<int, double> distanceToCentroid = CalcDistanceToCentroid(centroids[5], data);
 
-            int total = 0;
+            Dictionary<int, Dictionary<int, double>> DistDPToCentroids = new Dictionary<int, Dictionary<int, double>>();
 
-            foreach (var entry in distanceToCentroid)
+            foreach (var datapoint in data)
             {
-                Console.WriteLine(entry.Key + " : " + entry.Value);
+                DistDPToCentroids.Add(datapoint.Key, new Dictionary<int, double>());
+                foreach (var centroid in centroids)
+                {
+                    DistDPToCentroids[datapoint.Key].Add(centroid.Key, CalcDistanceToCentroid(centroid.Value, data)[datapoint.Key]);
+                    DistDPToCentroids[datapoint.Key] = DistDPToCentroids[datapoint.Key].OrderBy(x => x.Value)
+                        .ToDictionary(x => x.Key, x => x.Value);
+                }
+            }
+
+
+            foreach (var distanceToCentroid in DistDPToCentroids)
+            {
+                Console.WriteLine(distanceToCentroid.Key);
+                foreach (var ie in distanceToCentroid.Value)
+                {
+                    Console.WriteLine(ie.Key + " : " + ie.Value);
+                }
+                Console.WriteLine("\n");
             }
 
             Console.WriteLine();
